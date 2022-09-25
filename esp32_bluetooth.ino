@@ -5,27 +5,42 @@
 #endif
 
 BluetoothSerial SerialBT;
-char* BT_String = "";
+String BT_String = "";
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-  SerialBT.begin("ESP32_BT");  //藍芽裝置名稱
+  SerialBT.begin("ESP32_BT"); //藍芽裝置名稱
   Serial.println("The device started, now you can pair it with bluetooth!");
 }
 
-void loop() {
-  if (Serial.available()) {
-    //電腦端接受資料發送到藍牙
+void loop()
+{
+  if (Serial.available())
+  {
+    // 電腦端接受資料發送到藍牙
     SerialBT.write(Serial.read());
-    if (Serial.read() =! "%") {
-      BT_String += Serial.read();
-    }
   }
-  if (SerialBT.available()) {
+  if (SerialBT.available())
+  {
     //藍牙端接受資料發送到電腦
-    Serial.write(SerialBT.read());
+    char BT_Input_String = SerialBT.read();
+    if (String(BT_Input_String) != "")
+    {
+      if (String(BT_Input_String) == "%")
+      {
+        Serial.print(BT_String);
+        Serial.print("\n");
+        BT_String = "";
+      }
+      else
+      {
+        BT_String += BT_Input_String;
+      }
+    }
   }
   delay(20);
 }
-void getString() {
+void mate_Mode(int mode)
+{
 }
