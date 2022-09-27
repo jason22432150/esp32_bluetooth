@@ -29,8 +29,22 @@ void loop()
     {
       if (String(BT_Input_String) == "%")
       {
-        Serial.print(BT_String);
-        Serial.print("\n");
+        if (BT_String.indexOf("mode") != -1)
+        {
+          // mode123
+          mate_Mode(String(BT_String.substring(4, BT_String.length())));
+        }
+        else if (BT_String.indexOf("rgb") != -1)
+        {
+          String R, G, B;
+          // rgb(255,255,255)
+          // 0123456789
+          R = String(BT_String.substring(4, 7));
+          G = String(BT_String.substring(8, 11));
+          B = String(BT_String.substring(12, 15));
+          mate_RGB(R, G, B);
+        }
+        print_test("BT_String", BT_String);
         BT_String = "";
       }
       else
@@ -41,6 +55,31 @@ void loop()
   }
   delay(20);
 }
-void mate_Mode(int mode)
+
+void mate_Mode(String mode)
 {
+  print_test("mate_Mode", String(mode));
+}
+
+void mate_RGB(String R, String G, String B)
+{
+  print_test("mate_RGB R", String(R));
+  print_test("mate_RGB G", String(G));
+  print_test("mate_RGB B", String(B));
+}
+
+String make_string_three(String string)
+{
+  while (string.length() != 3)
+  {
+    string = "0" + string;
+  };
+  return (string);
+}
+
+void print_test(String typeTxt, String inputTxt)
+{
+  Serial.print(typeTxt);
+  Serial.print(": ");
+  Serial.println(inputTxt);
 }
