@@ -53,6 +53,7 @@ void loop()
           // stop
           mate_stop();
           now_mode = "stop";
+          BT_String = "";
         }
         if (BT_String.indexOf("mode") != -1)
         {
@@ -60,29 +61,37 @@ void loop()
           now_mode = "mode";
           mode_data = String(BT_String.substring(4, BT_String.length()));
           mate_Mode(String(BT_String.substring(4, BT_String.length())));
+          BT_String = "";
+        }
+        else if (BT_String.indexOf("rainbow") != -1)
+        {
+          // mode123
+          now_mode = "rainbow";
+          rainbow(10);
+          BT_String = "";
         }
         else if (BT_String.indexOf("rgb") != -1)
         {
-          int R1, G1, B1, R2, G2, B2;
+          int R_str1, G_str1, B_str1, R_str2, G_str2, B_str2;
           // rgb(255,000,255),rgb(000,255,255)
+          // rgb255,000,255,000,255,255
           // 0000000000111111111122222222223333
           // 0123456789012345678901234567890123
           now_mode = "rgb";
-          R1 = BT_String.substring(4, 7).toInt();
-          G1 = BT_String.substring(8, 11).toInt();
-          B1 = BT_String.substring(12, 15).toInt();
-          R2 = BT_String.substring(21, 24).toInt();
-          G2 = BT_String.substring(25, 28).toInt();
-          B2 = BT_String.substring(29, 32).toInt();
+          R_str1 = BT_String.substring(3, 6).toInt();
+          G_str1 = BT_String.substring(7, 10).toInt();
+          B_str1 = BT_String.substring(11, 14).toInt();
+          R_str2 = BT_String.substring(15, 18).toInt();
+          G_str2 = BT_String.substring(19, 22).toInt();
+          B_str2 = BT_String.substring(23, 26).toInt();
           // R1 = String(BT_String.substring(4, 7));
           // G1 = String(BT_String.substring(8, 11));
           // B1 = String(BT_String.substring(12, 15));
           // R2 = String(BT_String.substring(21, 24));
           // G2 = String(BT_String.substring(25, 28));
           // B2 = String(BT_String.substring(29, 32));
-          mate_RGB(R1, G1, B1, R2, G2, B2);
+          mode_rgb(R_str1, G_str1, B_str1, R_str2, G_str2, B_str2);
         }
-        print_test("BT_String", BT_String);
         BT_String = "";
       }
       else
@@ -100,12 +109,10 @@ void loop()
 
 void mate_Mode(String mode)
 {
-  print_test("mate_Mode", mode);
   switch (mode.toInt())
   {
   case 1:
     mode_01();
-
   default:
     break;
   }
@@ -124,23 +131,15 @@ void mate_stop()
   print_test("stop", "STOP");
 }
 
-void mate_RGB(int RR1, int GG1, int BB1, int RR2, int GG2, int BB2)
-{
-  print_test("mate_RGB R1", String(RR1));
-  print_test("mate_RGB G1", String(GG1));
-  print_test("mate_RGB B1", String(BB1));
-  print_test("mate_RGB R2", String(RR2));
-  print_test("mate_RGB G2", String(GG2));
-  print_test("mate_RGB B2", String(BB2));
-  for (int i = 0; i < NUMPIXELS; i++)
-  { //(R, G,  B )
-    pixels1.setPixelColor(i, pixels1.Color(R1, G1, B1));
-    pixels1.show(); // Send the updated pixel colors to the hardware.
-    pixels2.setPixelColor(i, pixels2.Color(R2, G2, B2));
-    pixels2.show(); // Send the updated pixel colors to the hardware.
-  }
-  now_mode = "0";
-}
+// void mate_RGB(int RR1, int GG1, int BB1, int RR2, int GG2, int BB2)
+// {
+//   print_test("mate_RGB R1", String(RR1));
+//   print_test("mate_RGB G1", String(GG1));
+//   print_test("mate_RGB B1", String(BB1));
+//   print_test("mate_RGB R2", String(RR2));
+//   print_test("mate_RGB G2", String(GG2));
+//   print_test("mate_RGB B2", String(BB2));
+// }
 
 String make_string_three(String string)
 {
@@ -159,20 +158,22 @@ void print_test(String typeTxt, String inputTxt)
 }
 
 // 以下為自訂mode
-void mode_rgb(String R1, String G1, String B1, String R2, String G2, String B2)
+void mode_rgb(int R_int1, int G_int1, int B_int1, int R_int2, int G_int2, int B_int2)
 {
+  print_test("mode_rgb", BT_String);
   for (int i = 0; i < NUMPIXELS; i++)
   { //(R, G,  B )
-    pixels1.setPixelColor(i, pixels1.Color(R1, R2, 255));
+    pixels1.setPixelColor(i, pixels1.Color(R_int1, G_int1, B_int1));
     pixels1.show(); // Send the updated pixel colors to the hardware.
-    pixels2.setPixelColor(i, pixels2.Color(200, 0, 255));
+    pixels2.setPixelColor(i, pixels2.Color(R_int2, G_int2, B_int2));
     pixels2.show(); // Send the updated pixel colors to the hardware.
   }
-  now_mode = "0";
+  now_mode = "rgb";
 }
 
-void mode_01()
+void mode_01() //籃 紫
 {
+  print_test("mate_Mode", "1");
   for (int i = 0; i < NUMPIXELS; i++)
   { //(R, G,  B )
     pixels1.setPixelColor(i, pixels1.Color(0, 0, 255));
@@ -181,4 +182,29 @@ void mode_01()
     pixels2.show(); // Send the updated pixel colors to the hardware.
   }
   now_mode = "0";
+}
+
+void rainbow(int wait) {
+  print_test("rainbow", "rainbow");
+  // Hue of first pixel runs 5 complete loops through the color wheel.
+  // Color wheel has a range of 65536 but it's OK if we roll over, so
+  // just count from 0 to 5*65536. Adding 256 to firstPixelHue each time
+  // means we'll make 5*65536/256 = 1280 passes through this loop:
+  for(long firstPixelHue = 0; firstPixelHue < 5*65536; firstPixelHue += 256) {
+    if (String(SerialBT.read()) != ""){
+      break;
+    }
+    // strip.rainbow() can take a single argument (first pixel hue) or
+    // optionally a few extras: number of rainbow repetitions (default 1),
+    // saturation and value (brightness) (both 0-255, similar to the
+    // ColorHSV() function, default 255), and a true/false flag for whether
+    // to apply gamma correction to provide 'truer' colors (default true).
+    pixels1.rainbow(firstPixelHue);
+    pixels2.rainbow(firstPixelHue);
+    // Above line is equivalent to:
+    // strip.rainbow(firstPixelHue, 1, 255, 255, true);
+    pixels1.show(); // Update strip with new contents
+    pixels2.show(); // Update strip with new contents
+    delay(wait);  // Pause for a moment
+  }
 }
