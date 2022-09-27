@@ -26,7 +26,7 @@ void setup()
   pixels2.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
   for (int i = 0; i < NUMPIXELS; i++)
   {
-    pixels1.setPixelColor(i, pixels1.Color(0, 0, 0));   
+    pixels1.setPixelColor(i, pixels1.Color(0, 0, 0));
     pixels1.show(); // Send the updated pixel colors to the hardware.
     pixels2.setPixelColor(i, pixels2.Color(0, 0, 0));
     pixels2.show(); // Send the updated pixel colors to the hardware.
@@ -89,17 +89,25 @@ void loop()
 void mate_Mode(String mode)
 {
   print_test("mate_Mode", mode);
+  switch (mode)
+  {
+  case mode == "1" mode01();
+
+      default:
+    break;
+  }
 }
 
 void stop()
 {
   for (int i = 0; i < NUMPIXELS; i++)
   {
-    pixels1.setPixelColor(i, pixels1.Color(0, 0, 0));   
+    pixels1.setPixelColor(i, pixels1.Color(0, 0, 0));
     pixels1.show(); // Send the updated pixel colors to the hardware.
     pixels2.setPixelColor(i, pixels2.Color(0, 0, 0));
     pixels2.show(); // Send the updated pixel colors to the hardware.
   }
+  now_mode = "stop";
   print_test("stop", "STOP");
 }
 
@@ -126,8 +134,14 @@ void print_test(String typeTxt, String inputTxt)
   Serial.println(inputTxt);
 }
 
-
 // 以下為自訂mode
 void mode01()
 {
+  for (int i = 0; i < NUMPIXELS; i++)
+  { //(R, G,  B )
+    pixels1.setPixelColor(i, pixels1.Color(0, 0, 255));
+    pixels1.show(); // Send the updated pixel colors to the hardware.
+    pixels2.setPixelColor(i, pixels2.Color(200, 0, 255));
+    pixels2.show(); // Send the updated pixel colors to the hardware.
+  }
 }
