@@ -90,7 +90,7 @@ void loop()
         {
           String R, G, B;
           // rgb(255,255,255)
-          // 0123456789
+          // 012345678910
           R = String(BT_String.substring(4, 7));
           G = String(BT_String.substring(8, 11));
           B = String(BT_String.substring(12, 15));
