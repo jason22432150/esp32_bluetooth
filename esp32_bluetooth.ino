@@ -2,8 +2,8 @@
 
 #include <Adafruit_NeoPixel.h>
 
-#define PIN1 10
-#define PIN2 11
+#define PIN1 18
+#define PIN2 33
 #define NUMPIXELS 20
 Adafruit_NeoPixel pixels1(NUMPIXELS, PIN1);
 Adafruit_NeoPixel pixels2(NUMPIXELS, PIN2);
@@ -91,9 +91,10 @@ void mate_Mode(String mode)
   print_test("mate_Mode", mode);
   switch (mode)
   {
-  case mode == "1" mode01();
+  case 1:
+    mode01();
 
-      default:
+  default:
     break;
   }
 }
