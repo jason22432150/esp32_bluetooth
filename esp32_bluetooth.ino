@@ -1,10 +1,37 @@
 #include "BluetoothSerial.h"
 
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#endif
+
+// Which pin on the Arduino is connected to the NeoPixels?
+// On a Trinket or Gemma we suggest changing this to 1:
+#define LED_PIN_one 19
+#define LED_PIN_two 33
+
+// How many NeoPixels are attached to the Arduino?
+#define LED_COUNT 60
+
+// Declare our NeoPixel strip object:
+Adafruit_NeoPixel strip1(LED_COUNT, LED_PIN_one, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip2(LED_COUNT, LED_PIN_two, NEO_GRB + NEO_KHZ800);
+// Argument 1 = Number of pixels in NeoPixel strip
+// Argument 2 = Arduino pin number (most are valid)
+// Argument 3 = Pixel type flags, add together as needed:
+//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
+//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
+//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
+//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
+//   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
+
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
 BluetoothSerial SerialBT;
+String now_mode = "stop";
+String mode_data;
 String BT_String = "";
 
 void setup()
@@ -29,9 +56,16 @@ void loop()
     {
       if (String(BT_Input_String) == "%")
       {
+        if (BT_String.indexOf("stop") != -1)
+        {
+          // stop
+          now_mode = "stop";
+        }
         if (BT_String.indexOf("mode") != -1)
         {
           // mode123
+          now_mode = "mode";
+          mode_data = String(BT_String.substring(4, BT_String.length()));
           mate_Mode(String(BT_String.substring(4, BT_String.length())));
         }
         else if (BT_String.indexOf("rgb") != -1)
@@ -54,11 +88,22 @@ void loop()
     }
   }
   delay(20);
+  if (now_mode == "mode")
+  {
+    mate_Mode(String(mode_data));
+  }
 }
 
 void mate_Mode(String mode)
 {
-  print_test("mate_Mode", String(mode));
+  print_test("mate_Mode", mode);
+}
+
+void stop()
+{
+  colorWipe(strip1.Color(0, 0, 0), 0);
+  colorWipe(strip2.Color(0, 0, 0), 0);
+  print_test("stop", "STOP");
 }
 
 void mate_RGB(String R, String G, String B)
@@ -82,4 +127,21 @@ void print_test(String typeTxt, String inputTxt)
   Serial.print(typeTxt);
   Serial.print(": ");
   Serial.println(inputTxt);
+}
+
+void colorWipe(uint32_t color, int wait)
+{
+  for (int i = 0; i < strip1.numPixels(); i++)
+  {
+    strip1.setPixelColor(i, color);
+    strip2.setPixelColor(i, color);
+    strip1.show();
+    strip2.show();
+    delay(wait);
+  }
+}
+
+// 以下為自訂mode
+void mode01()
+{
 }
