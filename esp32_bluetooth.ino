@@ -122,4 +122,5 @@ void mode01() {
     pixels2.setPixelColor(i, pixels2.Color(200, 0, 255));
     pixels2.show();  // Send the updated pixel colors to the hardware.
   }
+  now_mode = "0";
 }
