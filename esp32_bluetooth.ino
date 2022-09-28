@@ -19,8 +19,8 @@ String mode_data = "";
 String BT_String = "";
 long PixelHue = 0;
 byte mode_2_index = 0;
-int mode_2_wait = 1000;
-int mode_3_wait = 500;
+int mode_2_wait = 300;
+int mode_3_wait = 100;
 byte mode_3_index = 0;
 
 void setup()
