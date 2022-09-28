@@ -46,85 +46,64 @@ void loop()
     // 電腦端接受資料發送到藍牙
     SerialBT.write(Serial.read());
   }
-  if (SerialBT.available())
+  SerialBT_read();
+  //藍牙端接受資料發送到電腦
+  if (BT_String.indexOf("stop") != -1)
   {
-    //藍牙端接受資料發送到電腦
-    BT_Input_String = SerialBT.read();
-    if (String(BT_Input_String) != "")
-    {
-      if (String(BT_Input_String) == "%")
-      {
-        if (BT_String.indexOf("stop") != -1)
-        {
-          // stop
-          mate_stop();
-          now_mode = "stop";
-          i
-              BT_String = "";
-        }
-        if (BT_String.indexOf("mode") != -1)
-        {
-          // mode123
-          now_mode = "mode";
-          mode_data = String(BT_String.substring(4, BT_String.length()));
-          mate_Mode(String(BT_String.substring(4, BT_String.length())));
-          BT_String = "";
-        }
-        else if (BT_String.indexOf("rainbow") != -1)
-        {
-          // mode123
-          now_mode = "rainbow";
-          rainbow(0);
-          BT_String = "";
-        }
-        else if (BT_String.indexOf("rgb") != -1)
-        {
-          int R_str1, G_str1, B_str1, R_str2, G_str2, B_str2;
-          // rgb(255,000,255),rgb(000,255,255)
-          // rgb255,000,255,000,255,255
-          // 0000000000111111111122222222223333
-          // 0123456789012345678901234567890123
-          now_mode = "rgb";
-          R_str1 = BT_String.substring(3, 6).toInt();
-          G_str1 = BT_String.substring(7, 10).toInt();
-          B_str1 = BT_String.substring(11, 14).toInt();
-          R_str2 = BT_String.substring(15, 18).toInt();
-          G_str2 = BT_String.substring(19, 22).toInt();
-          B_str2 = BT_String.substring(23, 26).toInt();
-          mode_rgb(R_str1, G_str1, B_str1, R_str2, G_str2, B_str2);
-        }
-        BT_String = "";
-      }
-      else
-      {
-        BT_String += BT_Input_String;
-      }
-    }
+    // stop
+    mate_stop();
+    now_mode = "stop";
+    BT_String = "";
   }
+  else if (BT_String.indexOf("mode") != -1)
+  {
+    // mode123
+    now_mode = "mode";
+    mode_data = String(BT_String.substring(4, BT_String.length()));
+    mate_Mode(String(BT_String.substring(4, BT_String.length())));
+    BT_String = "";
+  }
+  else if (BT_String.indexOf("rainbow") != -1)
+  {
+    // mode123
+    now_mode = "rainbow";
+    rainbow(0);
+    BT_String = "";
+  }
+  else if (BT_String.indexOf("rgb") != -1)
+  {
+    int R_str1, G_str1, B_str1, R_str2, G_str2, B_str2;
+    // rgb(255,000,255),rgb(000,255,255)
+    // rgb255,000,255,000,255,255
+    // 0000000000111111111122222222223333
+    // 0123456789012345678901234567890123
+    now_mode = "rgb";
+    R_str1 = BT_String.substring(3, 6).toInt();
+    G_str1 = BT_String.substring(7, 10).toInt();
+    B_str1 = BT_String.substring(11, 14).toInt();
+    R_str2 = BT_String.substring(15, 18).toInt();
+    G_str2 = BT_String.substring(19, 22).toInt();
+    B_str2 = BT_String.substring(23, 26).toInt();
+    mode_rgb(R_str1, G_str1, B_str1, R_str2, G_str2, B_str2);
+  }
+  BT_String = "";
   if (now_mode == "rainbow")
   {
-    // mate_Mode(String(mode_data));
     rainbow(0);
   }
   else if (now_mode == "2")
   {
-    // mate_Mode(String(mode_data));
     mode_02();
     delay(mode_2_wait);
   }
   else if (now_mode == "3")
   {
-    // mate_Mode(String(mode_data));
     mode_03();
     delay(mode_3_wait);
   }
-  // else
-  // {
-  //   delay(20);
-  // }
 }
 
-String SerialBT_read()
+void SerialBT_read()
 {
   if (SerialBT.available())
   {
@@ -132,13 +111,10 @@ String SerialBT_read()
     char BT_Input_String = SerialBT.read();
     if (String(BT_Input_String) != "")
     {
-      if (String(BT_Input_String) == "%")
-      {
-        return BT_String;
-      }
-      else
+      while (String(BT_Input_String) != "%")
       {
         BT_String += BT_Input_String;
+        BT_Input_String = SerialBT.read();
       }
     }
   }
@@ -166,25 +142,6 @@ void mate_stop()
   now_mode = "stop";
   print_test("stop", "STOP");
 }
-
-// void mate_RGB(int RR1, int GG1, int BB1, int RR2, int GG2, int BB2)
-// {
-//   print_test("mate_RGB R1", String(RR1));
-//   print_test("mate_RGB G1", String(GG1));
-//   print_test("mate_RGB B1", String(BB1));
-//   print_test("mate_RGB R2", String(RR2));
-//   print_test("mate_RGB G2", String(GG2));
-//   print_test("mate_RGB B2", String(BB2));
-// }
-
-// String make_string_three(String string)
-// {
-//   while (string.length() != 3)
-//   {
-//     string = "0" + string;
-//   };
-//   return (string);
-// }
 
 void print_test(String typeTxt, String inputTxt)
 {
@@ -232,6 +189,7 @@ void mode_02() //紅 藍 閃
       pixels2.setPixelColor(i, pixels2.Color(255, 0, 0));
       pixels2.show(); // Send the updated pixel colors to the hardware.
     }
+    SerialBT_read();
     mode_2_index = 1;
   }
   else if (mode_2_index == 1)
@@ -243,9 +201,9 @@ void mode_02() //紅 藍 閃
       pixels2.setPixelColor(i, pixels2.Color(0, 0, 255));
       pixels2.show(); // Send the updated pixel colors to the hardware.
     }
+    SerialBT_read();
     mode_2_index = 0;
   }
-  // delay(mode_2_wait);
   now_mode = "2";
 }
 
@@ -261,6 +219,7 @@ void mode_03() //藍 紫 閃
       pixels2.setPixelColor(i, pixels2.Color(255, 0, 0));
       pixels2.show(); // Send the updated pixel colors to the hardware.
     }
+    SerialBT_read();
     mode_3_index = 1;
   }
   else if (mode_3_index == 1)
@@ -272,9 +231,9 @@ void mode_03() //藍 紫 閃
       pixels2.setPixelColor(i, pixels2.Color(0, 0, 0));
       pixels2.show(); // Send the updated pixel colors to the hardware.
     }
+    SerialBT_read();
     mode_3_index = 0;
   }
-  // delay(mode_3_wait);
   now_mode = "3";
 }
 
