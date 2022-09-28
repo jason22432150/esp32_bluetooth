@@ -13,13 +13,14 @@ Adafruit_NeoPixel pixels2(NUMPIXELS, PIN2);
 #endif
 
 BluetoothSerial SerialBT;
+// char BT_Input_String;
 String now_mode = "stop";
 String mode_data = "";
 String BT_String = "";
 long PixelHue = 0;
 byte mode_2_index = 0;
 int mode_2_wait = 1000;
-int mode_3_wait = 800;
+int mode_3_wait = 500;
 byte mode_3_index = 0;
 
 void setup()
@@ -48,7 +49,7 @@ void loop()
   if (SerialBT.available())
   {
     //藍牙端接受資料發送到電腦
-    char BT_Input_String = SerialBT.read();
+    BT_Input_String = SerialBT.read();
     if (String(BT_Input_String) != "")
     {
       if (String(BT_Input_String) == "%")
@@ -58,7 +59,8 @@ void loop()
           // stop
           mate_stop();
           now_mode = "stop";
-          BT_String = "";
+          i
+              BT_String = "";
         }
         if (BT_String.indexOf("mode") != -1)
         {
@@ -89,12 +91,6 @@ void loop()
           R_str2 = BT_String.substring(15, 18).toInt();
           G_str2 = BT_String.substring(19, 22).toInt();
           B_str2 = BT_String.substring(23, 26).toInt();
-          // R1 = String(BT_String.substring(4, 7));
-          // G1 = String(BT_String.substring(8, 11));
-          // B1 = String(BT_String.substring(12, 15));
-          // R2 = String(BT_String.substring(21, 24));
-          // G2 = String(BT_String.substring(25, 28));
-          // B2 = String(BT_String.substring(29, 32));
           mode_rgb(R_str1, G_str1, B_str1, R_str2, G_str2, B_str2);
         }
         BT_String = "";
@@ -105,7 +101,6 @@ void loop()
       }
     }
   }
-  delay(20);
   if (now_mode == "rainbow")
   {
     // mate_Mode(String(mode_data));
@@ -115,27 +110,48 @@ void loop()
   {
     // mate_Mode(String(mode_data));
     mode_02();
+    delay(mode_2_wait);
   }
   else if (now_mode == "3")
   {
     // mate_Mode(String(mode_data));
     mode_03();
+    delay(mode_3_wait);
+  }
+  // else
+  // {
+  //   delay(20);
+  // }
+}
+
+String SerialBT_read()
+{
+  if (SerialBT.available())
+  {
+    //藍牙端接受資料發送到電腦
+    char BT_Input_String = SerialBT.read();
+    if (String(BT_Input_String) != "")
+    {
+      if (String(BT_Input_String) == "%")
+      {
+        return BT_String;
+      }
+      else
+      {
+        BT_String += BT_Input_String;
+      }
+    }
   }
 }
 
 void mate_Mode(String mode)
 {
-  switch (mode.toInt())
-  {
-  case 1:
+  if (mode.toInt() == 1)
     mode_01();
-  case 2:
+  else if (mode.toInt() == 2)
     mode_02();
-  case 3:
+  else if (mode.toInt() == 3)
     mode_03();
-  default:
-    break;
-  }
 }
 
 void mate_stop()
@@ -161,14 +177,14 @@ void mate_stop()
 //   print_test("mate_RGB B2", String(BB2));
 // }
 
-String make_string_three(String string)
-{
-  while (string.length() != 3)
-  {
-    string = "0" + string;
-  };
-  return (string);
-}
+// String make_string_three(String string)
+// {
+//   while (string.length() != 3)
+//   {
+//     string = "0" + string;
+//   };
+//   return (string);
+// }
 
 void print_test(String typeTxt, String inputTxt)
 {
@@ -228,14 +244,14 @@ void mode_02() //紅 藍 閃
       pixels2.show(); // Send the updated pixel colors to the hardware.
     }
     mode_2_index = 0;
-    delay(mode_2_wait);
-    now_mode = "2";
   }
+  // delay(mode_2_wait);
+  now_mode = "2";
 }
 
 void mode_03() //藍 紫 閃
 {
-  print_test("mate_Mode", "2");
+  print_test("mate_Mode", "3");
   if (mode_3_index == 0)
   {
     for (int i = 0; i < NUMPIXELS; i++)
@@ -257,9 +273,9 @@ void mode_03() //藍 紫 閃
       pixels2.show(); // Send the updated pixel colors to the hardware.
     }
     mode_3_index = 0;
-    delay(mode_3_wait);
-    now_mode = "3";
   }
+  // delay(mode_3_wait);
+  now_mode = "3";
 }
 
 void rainbow(int wait) //彩色流水燈
@@ -272,7 +288,7 @@ void rainbow(int wait) //彩色流水燈
   // for (PixelHue < 5 * 65536; PixelHue += 256)
   if (PixelHue < 65536)
   {
-    PixelHue += 768; // 256
+    PixelHue += 16; // 256
     // strip.rainbow() can take a single argument (first pixel hue) or
     // optionally a few extras: number of rainbow repetitions (default 1),
     // saturation and value (brightness) (both 0-255, similar to the
