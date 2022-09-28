@@ -17,6 +17,10 @@ String now_mode = "stop";
 String mode_data = "";
 String BT_String = "";
 long PixelHue = 0;
+byte mode_2_index = 0;
+int mode_2_wait = 1000;
+int mode_3_wait = 800;
+byte mode_3_index = 0;
 
 void setup()
 {
@@ -100,15 +104,22 @@ void loop()
         BT_String += BT_Input_String;
       }
     }
-    // else if (){
-
-    // }
   }
   delay(20);
   if (now_mode == "rainbow")
   {
     // mate_Mode(String(mode_data));
     rainbow(0);
+  }
+  else if (now_mode == "2")
+  {
+    // mate_Mode(String(mode_data));
+    mode_02();
+  }
+  else if (now_mode == "3")
+  {
+    // mate_Mode(String(mode_data));
+    mode_03();
   }
 }
 
@@ -118,6 +129,10 @@ void mate_Mode(String mode)
   {
   case 1:
     mode_01();
+  case 2:
+    mode_02();
+  case 3:
+    mode_03();
   default:
     break;
   }
@@ -189,7 +204,65 @@ void mode_01() //籃 紫
   now_mode = "0";
 }
 
-void rainbow(int wait)
+void mode_02() //紅 藍 閃
+{
+  print_test("mate_Mode", "2");
+  if (mode_2_index == 0)
+  {
+    for (int i = 0; i < NUMPIXELS; i++)
+    { //(R, G,  B )
+      pixels1.setPixelColor(i, pixels1.Color(0, 0, 255));
+      pixels1.show(); // Send the updated pixel colors to the hardware.
+      pixels2.setPixelColor(i, pixels2.Color(255, 0, 0));
+      pixels2.show(); // Send the updated pixel colors to the hardware.
+    }
+    mode_2_index = 1;
+  }
+  else if (mode_2_index == 1)
+  {
+    for (int i = 0; i < NUMPIXELS; i++)
+    { //(R, G,  B )
+      pixels1.setPixelColor(i, pixels1.Color(255, 0, 0));
+      pixels1.show(); // Send the updated pixel colors to the hardware.
+      pixels2.setPixelColor(i, pixels2.Color(0, 0, 255));
+      pixels2.show(); // Send the updated pixel colors to the hardware.
+    }
+    mode_2_index = 0;
+    delay(mode_2_wait);
+    now_mode = "2";
+  }
+}
+
+void mode_03() //藍 紫 閃
+{
+  print_test("mate_Mode", "2");
+  if (mode_3_index == 0)
+  {
+    for (int i = 0; i < NUMPIXELS; i++)
+    { //(R, G,  B )
+      pixels1.setPixelColor(i, pixels1.Color(0, 0, 255));
+      pixels1.show(); // Send the updated pixel colors to the hardware.
+      pixels2.setPixelColor(i, pixels2.Color(255, 0, 0));
+      pixels2.show(); // Send the updated pixel colors to the hardware.
+    }
+    mode_3_index = 1;
+  }
+  else if (mode_3_index == 1)
+  {
+    for (int i = 0; i < NUMPIXELS; i++)
+    { //(R, G,  B )
+      pixels1.setPixelColor(i, pixels1.Color(0, 0, 0));
+      pixels1.show(); // Send the updated pixel colors to the hardware.
+      pixels2.setPixelColor(i, pixels2.Color(0, 0, 0));
+      pixels2.show(); // Send the updated pixel colors to the hardware.
+    }
+    mode_3_index = 0;
+    delay(mode_3_wait);
+    now_mode = "3";
+  }
+}
+
+void rainbow(int wait) //彩色流水燈
 {
   print_test("rainbow", "rainbow");
   // Hue of first pixel runs 5 complete loops through the color wheel.
