@@ -128,6 +128,8 @@ void mate_Mode(String mode)
     mode_02();
   else if (mode.toInt() == 3)
     mode_03();
+  else if (mode.toInt() == 4)
+    mode_04();
 }
 
 void mate_stop()
@@ -216,7 +218,7 @@ void mode_03() //藍 紫 閃
     { //(R, G,  B )
       pixels1.setPixelColor(i, pixels1.Color(0, 0, 255));
       pixels1.show(); // Send the updated pixel colors to the hardware.
-      pixels2.setPixelColor(i, pixels2.Color(255, 0, 0));
+      pixels2.setPixelColor(i, pixels2.Color(200, 0, 255));
       pixels2.show(); // Send the updated pixel colors to the hardware.
     }
     SerialBT_read();
@@ -235,6 +237,19 @@ void mode_03() //藍 紫 閃
     mode_3_index = 0;
   }
   now_mode = "3";
+}
+
+void mode_04() //籃 紫
+{
+  print_test("mate_Mode", "4");
+  for (int i = 0; i < NUMPIXELS; i++)
+  { //(R, G,  B )
+    pixels1.setPixelColor(i, pixels1.Color(255, 255, 255));
+    pixels1.show(); // Send the updated pixel colors to the hardware.
+    pixels2.setPixelColor(i, pixels2.Color(255, 255, 255));
+    pixels2.show(); // Send the updated pixel colors to the hardware.
+  }
+  now_mode = "0";
 }
 
 void rainbow(int wait) //彩色流水燈
@@ -266,3 +281,5 @@ void rainbow(int wait) //彩色流水燈
     PixelHue = 0;
   }
 }
+
+
