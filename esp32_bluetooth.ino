@@ -17,11 +17,15 @@ BluetoothSerial SerialBT;
 String now_mode = "stop";
 String mode_data = "";
 String BT_String = "";
-long PixelHue = 0;
+long rainbow1_data = 0;
 byte mode_2_index = 0;
 int mode_2_wait = 300;
 int mode_3_wait = 100;
 byte mode_3_index = 0;
+byte mode_5_wait = 0;
+byte mode_5_index = 0;
+byte mode_5_data = 0;
+uint16_t rainbow2_data = 0;
 
 void setup()
 {
@@ -63,11 +67,16 @@ void loop()
     mate_Mode(String(BT_String.substring(4, BT_String.length())));
     BT_String = "";
   }
-  else if (BT_String.indexOf("rainbow") != -1)
+  else if (BT_String.indexOf("rainbow1") != -1)
   {
-    // mode123
-    now_mode = "rainbow";
-    rainbow(0);
+    now_mode = "rainbow1";
+    rainbow1(0);
+    BT_String = "";
+  }
+  else if (BT_String.indexOf("rainbow2") != -1)
+  {
+    now_mode = "rainbow2";
+    rainbow2(50);
     BT_String = "";
   }
   else if (BT_String.indexOf("rgb") != -1)
@@ -87,9 +96,13 @@ void loop()
     mode_rgb(R_str1, G_str1, B_str1, R_str2, G_str2, B_str2);
   }
   BT_String = "";
-  if (now_mode == "rainbow")
+  if (now_mode == "rainbow1")
   {
-    rainbow(0);
+    rainbow1(0);
+  }
+  else if (now_mode == "rainbow2")
+  {
+    rainbow2(50);
   }
   else if (now_mode == "2")
   {
@@ -100,6 +113,11 @@ void loop()
   {
     mode_03();
     delay(mode_3_wait);
+  }
+  else if (now_mode == "5")
+  {
+    mode_05();
+    delay(mode_5_wait);
   }
 }
 
@@ -130,6 +148,8 @@ void mate_Mode(String mode)
     mode_03();
   else if (mode.toInt() == 4)
     mode_04();
+  else if (mode.toInt() == 5)
+    mode_05();
 }
 
 void mate_stop()
@@ -239,37 +259,71 @@ void mode_03() //藍 紫 閃
   now_mode = "3";
 }
 
-void mode_04() //籃 紫
+void mode_04() //白 白
 {
   print_test("mate_Mode", "4");
   for (int i = 0; i < NUMPIXELS; i++)
   { //(R, G,  B )
-    pixels1.setPixelColor(i, pixels1.Color(255, 255, 255));
+    pixels1.setPixelColor(i, pixels1.Color(127, 127, 127));
     pixels1.show(); // Send the updated pixel colors to the hardware.
-    pixels2.setPixelColor(i, pixels2.Color(255, 255, 255));
+    pixels2.setPixelColor(i, pixels2.Color(127, 127, 127));
     pixels2.show(); // Send the updated pixel colors to the hardware.
   }
   now_mode = "0";
 }
-
-void rainbow(int wait) //彩色流水燈
+void mode_05() //紅 呼吸燈
 {
-  print_test("rainbow", "rainbow");
+  print_test("mate_Mode", "5");
+  if (mode_5_index == 0)
+  {
+    if (mode_5_data < 100)
+    {
+      mode_5_data++;
+    }
+    else
+    {
+      mode_5_index = 1;
+    }
+  }
+  else
+  {
+    if (mode_5_data > 0)
+    {
+      mode_5_data--;
+    }
+    else
+    {
+      mode_5_index = 0;
+    }
+  }
+  for (int i = 0; i < NUMPIXELS; i++)
+  { //(R, G,  B )
+    pixels1.setPixelColor(i, pixels1.Color(mode_5_data, 0, 0));
+    pixels1.show(); // Send the updated pixel colors to the hardware.
+    pixels2.setPixelColor(i, pixels2.Color(mode_5_data, 0, 0));
+    pixels2.show(); // Send the updated pixel colors to the hardware.
+  }
+  now_mode = "5";
+}
+
+void rainbow1(int wait) //彩色流水燈
+{
+  print_test("rainbow", "rainbow1");
   // Hue of first pixel runs 5 complete loops through the color wheel.
   // Color wheel has a range of 65536 but it's OK if we roll over, so
   // just count from 0 to 5*65536. Adding 256 to firstPixelHue each time
   // means we'll make 5*65536/256 = 1280 passes through this loop:
-  // for (PixelHue < 5 * 65536; PixelHue += 256)
-  if (PixelHue < 65536)
+  // for (rainbow1_data < 5 * 65536; rainbow1_data += 256)
+  if (rainbow1_data < 65536)
   {
-    PixelHue += 16; // 256
+    rainbow1_data += 32; // 256
     // strip.rainbow() can take a single argument (first pixel hue) or
     // optionally a few extras: number of rainbow repetitions (default 1),
     // saturation and value (brightness) (both 0-255, similar to the
     // ColorHSV() function, default 255), and a true/false flag for whether
     // to apply gamma correction to provide 'truer' colors (default true).
-    pixels1.rainbow(PixelHue);
-    pixels2.rainbow(PixelHue);
+    pixels1.rainbow(rainbow1_data);
+    pixels2.rainbow(rainbow1_data);
     // Above line is equivalent to:
     // strip.rainbow(firstPixelHue, 1, 255, 255, true);
     pixels1.show(); // Update strip with new contents
@@ -278,8 +332,73 @@ void rainbow(int wait) //彩色流水燈
   }
   else
   {
-    PixelHue = 0;
+    rainbow1_data = 0;
   }
 }
 
+void rainbow2(uint8_t wait)
+{
+  uint16_t i;
 
+  // for (j = 0; j < 256; j++)
+  // {
+  if (rainbow2_data < 256)
+  {
+    rainbow2_data = rainbow2_data + 1;
+    for (i = 0; i < pixels1.numPixels(); i++)
+    {
+      pixels1.setPixelColor(i, Wheel1((i + rainbow2_data) & 255));
+      //      pixels2.setPixelColor(i, Wheel1((i+rainbow2_data) & 255));
+    }
+    for (i = 0; i < pixels2.numPixels(); i++)
+    {
+      //      pixels1.setPixelColor(i, Wheel2((i+rainbow2_data) & 255));
+      pixels2.setPixelColor(i, Wheel2((i + rainbow2_data) & 255));
+    }
+    pixels1.show();
+    pixels2.show();
+    delay(wait);
+  }
+  else
+  {
+    rainbow2_data = 0;
+  }
+  // }
+}
+
+uint32_t Wheel1(byte WheelPos)
+{
+  WheelPos = 255 - WheelPos;
+  if (WheelPos < 85)
+  {
+    //    return pixels1.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+    return pixels2.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if (WheelPos < 170)
+  {
+    WheelPos -= 85;
+    return pixels1.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+    //     return pixels2.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  return pixels1.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  //   return pixels2.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+}
+uint32_t Wheel2(byte WheelPos)
+{
+  WheelPos = 255 - WheelPos;
+  if (WheelPos < 85)
+  {
+    //    return pixels1.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+    return pixels2.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if (WheelPos < 170)
+  {
+    WheelPos -= 85;
+    //    return pixels1.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+    return pixels2.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  //  return pixels1.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  return pixels2.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+}
