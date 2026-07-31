@@ -29,6 +29,17 @@ Arduino IDE：請啟用 ESP32 的 Bluetooth（Bluedroid）。若編譯出現 `Bl
 
 序列埠監控視窗建議 **115200** baud。
 
+### 手動進入 download mode
+
+若 Upload 出現 `Wrong boot mode`、`No serial data received` 或 `serial noise`，表示板子未進入燒錄模式，可手動操作：
+
+1. 關閉 Serial Monitor（避免佔用 COM 埠）後再按 Upload
+2. 出現 `Connecting...` 時**按住 BOOT**（有的板子標為 IO0）
+3. 若仍連不上：按住 BOOT → 按一下 **EN / RESET** → 鬆開 EN
+4. 看到開始寫入（例如 `Writing at 0x...`）後再鬆開 BOOT
+
+上傳不穩時可將 `platformio.ini` 的 `upload_speed` 降為 `115200`，並確認使用資料用 USB 線。
+
 ## 藍牙協定
 
 指令以字元組成，**以 `%` 結尾**。未收到 `%` 前會跨次累積，收到後才解析並清空。
