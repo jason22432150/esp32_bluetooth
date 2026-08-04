@@ -1,5 +1,14 @@
-#include "BluetoothSerial.h"
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
 #include <Adafruit_NeoPixel.h>
+
+// Nordic UART Service（NUS）UUID — 與手機 App / nRF Connect 對齊
+#define BLE_DEVICE_NAME "ESP32_BT"
+#define NUS_SERVICE_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
+#define NUS_RX_UUID "6E400002-B5A3-F393-E0A9-E50E24DCCA9E" // Central → ESP32
+#define NUS_TX_UUID "6E400003-B5A3-F393-E0A9-E50E24DCCA9E" // ESP32 → Central (notify)
 
 #define PIN1 18
 #define PIN2 33
@@ -7,13 +16,14 @@
 Adafruit_NeoPixel pixels1(NUMPIXELS, PIN1);
 Adafruit_NeoPixel pixels2(NUMPIXELS, PIN2);
 
-#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
-#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
-#endif
+BLEServer *pServer = nullptr;
+BLECharacteristic *pTxCharacteristic = nullptr;
+bool deviceConnected = false;
+bool oldDeviceConnected = false;
 
-BluetoothSerial SerialBT;
 String now_mode = "stop";
 String BT_String = "";
+volatile bool commandReady = false; // BLE onWrite 收到 '%' 時設為 true
 long rainbow1_data = 0;
 byte mode_2_index = 0;
 int mode_2_wait = 300;
@@ -23,6 +33,48 @@ byte mode_5_wait = 0;
 byte mode_5_index = 0;
 byte mode_5_data = 0;
 uint16_t rainbow2_data = 0;
+
+void parseCommand();
+void notifyTx(const String &msg);
+
+// 連線 / 斷線回調：斷線後需重新開始 advertising
+class ServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *server) override
+  {
+    deviceConnected = true;
+    Serial.println("BLE connected");
+  }
+
+  void onDisconnect(BLEServer *server) override
+  {
+    deviceConnected = false;
+    Serial.println("BLE disconnected");
+  }
+};
+
+// RX Characteristic：累積字元，遇到 '%' 標記指令可解析
+class RxCallbacks : public BLECharacteristicCallbacks
+{
+  void onWrite(BLECharacteristic *pCharacteristic) override
+  {
+    // ESP32 Arduino 2.x：getValue() 回傳 std::string
+    std::string value = pCharacteristic->getValue();
+    if (value.empty())
+      return;
+
+    for (size_t i = 0; i < value.length(); i++)
+    {
+      char c = value[i];
+      if (c == '%')
+      {
+        commandReady = true;
+        break;
+      }
+      BT_String += c;
+    }
+  }
+};
 
 // 兩條 strip 一次填色、各 show 一次（避免迴圈內 show 造成 N 倍傳輸）
 void fillBoth(uint32_t c1, uint32_t c2)
@@ -39,8 +91,32 @@ void fillBoth(uint32_t c1, uint32_t c2)
 void setup()
 {
   Serial.begin(115200);
-  SerialBT.begin("ESP32_BT"); // 藍芽裝置名稱
-  Serial.println("The device started, now you can pair it with bluetooth!");
+
+  BLEDevice::init(BLE_DEVICE_NAME);
+  pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new ServerCallbacks());
+
+  BLEService *pService = pServer->createService(NUS_SERVICE_UUID);
+
+  pTxCharacteristic = pService->createCharacteristic(
+      NUS_TX_UUID,
+      BLECharacteristic::PROPERTY_NOTIFY);
+  pTxCharacteristic->addDescriptor(new BLE2902());
+
+  BLECharacteristic *pRxCharacteristic = pService->createCharacteristic(
+      NUS_RX_UUID,
+      BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_WRITE_NR);
+  pRxCharacteristic->setCallbacks(new RxCallbacks());
+
+  pService->start();
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(NUS_SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  BLEDevice::startAdvertising();
+
+  Serial.println("BLE UART ready. Device name: ESP32_BT");
+  Serial.println("NUS Service: 6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
+
   pixels1.begin();
   pixels2.begin();
   fillBoth(0, 0);
@@ -48,47 +124,38 @@ void setup()
 
 void loop()
 {
-  if (Serial.available())
+  // USB Serial 也可送指令（方便本機 debug，同樣以 % 結尾）
+  while (Serial.available())
   {
-    SerialBT.write(Serial.read());
+    char c = Serial.read();
+    if (c == '%')
+    {
+      commandReady = true;
+      break;
+    }
+    if (c != '\r' && c != '\n')
+      BT_String += c;
   }
 
-  // 收到 '%' 才解析，半包保留到下一輪
-  if (SerialBT_read())
+  if (commandReady)
   {
-    if (BT_String.indexOf("stop") != -1)
-    {
-      mate_stop();
-      now_mode = "stop";
-    }
-    else if (BT_String.indexOf("mode") != -1)
-    {
-      now_mode = "mode";
-      mate_Mode(BT_String.substring(4));
-    }
-    else if (BT_String.indexOf("rainbow1") != -1)
-    {
-      now_mode = "rainbow1";
-      rainbow1(0);
-    }
-    else if (BT_String.indexOf("rainbow2") != -1)
-    {
-      now_mode = "rainbow2";
-      rainbow2(50);
-    }
-    else if (BT_String.indexOf("rgb") != -1)
-    {
-      // rgb255,000,255,000,255,255
-      now_mode = "rgb";
-      int R_str1 = BT_String.substring(3, 6).toInt();
-      int G_str1 = BT_String.substring(7, 10).toInt();
-      int B_str1 = BT_String.substring(11, 14).toInt();
-      int R_str2 = BT_String.substring(15, 18).toInt();
-      int G_str2 = BT_String.substring(19, 22).toInt();
-      int B_str2 = BT_String.substring(23, 26).toInt();
-      mode_rgb(R_str1, G_str1, B_str1, R_str2, G_str2, B_str2);
-    }
+    commandReady = false;
+    parseCommand();
     BT_String = "";
+  }
+
+  // 斷線後重新廣播，讓手機可再次掃描連線
+  if (!deviceConnected && oldDeviceConnected)
+  {
+    delay(500);
+    pServer->startAdvertising();
+    Serial.println("BLE advertising restarted");
+    oldDeviceConnected = deviceConnected;
+  }
+  if (deviceConnected && !oldDeviceConnected)
+  {
+    oldDeviceConnected = deviceConnected;
+    notifyTx("OK\n");
   }
 
   if (now_mode == "rainbow1")
@@ -116,21 +183,51 @@ void loop()
   }
 }
 
-// ponytail: 回傳 true 表示本輪收到結尾 '%'；無 timeout，髒資料需靠 stop 清
-bool SerialBT_read()
+void notifyTx(const String &msg)
 {
-  bool done = false;
-  while (SerialBT.available())
+  if (!deviceConnected || pTxCharacteristic == nullptr)
+    return;
+  pTxCharacteristic->setValue(msg.c_str());
+  pTxCharacteristic->notify();
+}
+
+/** 解析已累積的 BT_String（不含結尾 '%'）並執行對應燈效 */
+void parseCommand()
+{
+  if (BT_String.indexOf("stop") != -1)
   {
-    char c = SerialBT.read();
-    if (c == '%')
-    {
-      done = true;
-      break;
-    }
-    BT_String += c;
+    mate_stop();
+    now_mode = "stop";
   }
-  return done;
+  else if (BT_String.indexOf("mode") != -1)
+  {
+    now_mode = "mode";
+    mate_Mode(BT_String.substring(4));
+  }
+  else if (BT_String.indexOf("rainbow1") != -1)
+  {
+    now_mode = "rainbow1";
+    rainbow1(0);
+  }
+  else if (BT_String.indexOf("rainbow2") != -1)
+  {
+    now_mode = "rainbow2";
+    rainbow2(50);
+  }
+  else if (BT_String.indexOf("rgb") != -1)
+  {
+    // rgb255,000,255,000,255,255
+    now_mode = "rgb";
+    int R_str1 = BT_String.substring(3, 6).toInt();
+    int G_str1 = BT_String.substring(7, 10).toInt();
+    int B_str1 = BT_String.substring(11, 14).toInt();
+    int R_str2 = BT_String.substring(15, 18).toInt();
+    int G_str2 = BT_String.substring(19, 22).toInt();
+    int B_str2 = BT_String.substring(23, 26).toInt();
+    mode_rgb(R_str1, G_str1, B_str1, R_str2, G_str2, B_str2);
+  }
+
+  notifyTx(BT_String + "\n");
 }
 
 void mate_Mode(String mode)
