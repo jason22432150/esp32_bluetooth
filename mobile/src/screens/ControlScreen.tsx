@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { commonStyles as styles } from '../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { useBleStore } from '../store/useBleStore';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -174,67 +174,3 @@ export function ControlScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8fafc',
-  },
-  content: {
-    padding: 16,
-    gap: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  section: {
-    gap: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1e293b',
-  },
-  label: {
-    fontSize: 16,
-    color: '#334155',
-  },
-  hint: {
-    color: '#64748b',
-  },
-  deviceRow: {
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 8,
-    backgroundColor: '#ffffff',
-    marginBottom: 8,
-  },
-  deviceName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#0f172a',
-  },
-  deviceId: {
-    color: '#64748b',
-    marginTop: 4,
-  },
-  buttonGrid: {
-    gap: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#ffffff',
-  },
-  logText: {
-    fontSize: 13,
-    color: '#334155',
-    marginBottom: 4,
-  },
-});
