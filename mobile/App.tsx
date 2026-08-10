@@ -6,8 +6,11 @@ import {
   useColorScheme,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { ControlScreen } from './src/screens/ControlScreen';
+import { LedPicker } from './src/screens/LedPicker';
 
 async function requestAndroidBlePermissions() {
   if (Platform.OS !== 'android') {
@@ -32,6 +35,7 @@ async function requestAndroidBlePermissions() {
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
+  const Stack = createNativeStackNavigator();
 
   useEffect(() => {
     requestAndroidBlePermissions();
@@ -39,8 +43,12 @@ function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ControlScreen />
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Control" component={ControlScreen} />
+          <Stack.Screen name="LedPicker" component={LedPicker} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 }

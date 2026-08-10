@@ -12,16 +12,25 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useBleStore } from '../store/useBleStore';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   buildModeCommand,
   buildRainbowCommand,
   buildStopCommand,
   ensureCommandTerminator,
 } from '../utils/commands';
+import { LedPicker } from './LedPicker';
 
 export function ControlScreen() {
   const [customCommand, setCustomCommand] = useState('');
-  const modes = ['(固定)藍紫', '(固定)白白', '(爆閃)藍紫', '(互閃)警燈','(呼吸)紅色'];
+  const modes = [
+    '(固定)藍紫',
+    '(固定)白白',
+    '(爆閃)藍紫',
+    '(互閃)警燈',
+    '(呼吸)紅色',
+  ];
 
   const {
     isScanning,
@@ -35,6 +44,14 @@ export function ControlScreen() {
     disconnect,
     sendCommand,
   } = useBleStore();
+
+  type RootStackParamList = {
+    Control: undefined;
+    LedPicker: undefined;
+  };
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const handleSendCustom = () => {
     if (!customCommand.trim()) {
@@ -108,9 +125,7 @@ export function ControlScreen() {
               <Button
                 key={mode}
                 title={`mode${mode}`}
-                onPress={() =>
-                  sendCommand(buildModeCommand(mode as string))
-                }
+                onPress={() => sendCommand(buildModeCommand(mode as string))}
               />
             ))}
             <Button
@@ -122,6 +137,13 @@ export function ControlScreen() {
               onPress={() => sendCommand(buildRainbowCommand(2))}
             />
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Button
+            title="選擇LED"
+            onPress={() => navigation.navigate('LedPicker')}
+          />
         </View>
 
         <View style={styles.section}>
