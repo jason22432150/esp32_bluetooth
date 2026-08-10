@@ -14,7 +14,7 @@ export const buildStopCommand = () => {
   return 'stop%';
 };
 
-export const buildModeCommand = (mode: 1 | 2 | 3 | 4 | 5) => {
+export const buildModeCommand = (mode: string) => {
   return `mode${mode}%`;
 };
 

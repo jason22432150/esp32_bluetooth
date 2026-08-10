@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Button,
   FlatList,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useBleStore } from '../store/useBleStore';
 import {
@@ -21,6 +21,7 @@ import {
 
 export function ControlScreen() {
   const [customCommand, setCustomCommand] = useState('');
+  const modes = ['(固定)藍紫', '(固定)白白', '(爆閃)藍紫', '(互閃)警燈','(呼吸)紅色'];
 
   const {
     isScanning,
@@ -103,12 +104,12 @@ export function ControlScreen() {
               title="stop"
               onPress={() => sendCommand(buildStopCommand())}
             />
-            {[1, 2, 3, 4, 5].map(mode => (
+            {modes.map(mode => (
               <Button
                 key={mode}
                 title={`mode${mode}`}
                 onPress={() =>
-                  sendCommand(buildModeCommand(mode as 1 | 2 | 3 | 4 | 5))
+                  sendCommand(buildModeCommand(mode as string))
                 }
               />
             ))}
