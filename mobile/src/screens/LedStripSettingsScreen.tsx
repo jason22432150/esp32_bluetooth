@@ -16,7 +16,6 @@ export function LedStripSettingsScreen() {
   const { ledStripColor, setLedStripColor } = useLedStripColorStore();
   const [leftLedStripColor, setLeftLedStripColor] = useState('');
   const [rightLedStripColor, setRightLedStripColor] = useState('');
-  const [allLedStripColor, setAllLedStripColor] = useState('');
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -32,7 +31,6 @@ export function LedStripSettingsScreen() {
     const setters: Record<LedColorField, (value: string) => void> = {
       left: setLeftLedStripColor,
       right: setRightLedStripColor,
-      all: setAllLedStripColor,
     };
 
     setters[colorField](selectedColor);
@@ -55,7 +53,6 @@ export function LedStripSettingsScreen() {
   };
 
   const handleSave = () => {
-    setLedStripColor(allLedStripColor);
     setLeftLedStripColor(leftLedStripColor);
     setRightLedStripColor(rightLedStripColor);
   };
@@ -67,12 +64,22 @@ export function LedStripSettingsScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>左側燈條設定</Text>
-          <TextInput
-            style={styles.input}
-            value={leftLedStripColor}
-            onChangeText={setLeftLedStripColor}
-            placeholder="Enter LED strip color"
-          />
+          <View style={styles.horizontalRow}>
+            <View
+              style={[
+                styles.colorPreview,
+                leftLedStripColor
+                  ? { backgroundColor: leftLedStripColor }
+                  : null,
+              ]}
+            />
+            <TextInput
+              style={[styles.input, styles.inputFlex]}
+              value={leftLedStripColor}
+              onChangeText={setLeftLedStripColor}
+              placeholder="Enter LED strip color"
+            />
+          </View>
           <Button
             title="選擇顏色"
             onPress={() => openColorPicker('left', leftLedStripColor)}
@@ -81,29 +88,25 @@ export function LedStripSettingsScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>右側燈條設定</Text>
-          <TextInput
-            style={styles.input}
-            value={rightLedStripColor}
-            onChangeText={setRightLedStripColor}
-            placeholder="Enter LED strip color"
-          />
+          <View style={styles.horizontalRow}>
+            <View
+              style={[
+                styles.colorPreview,
+                rightLedStripColor
+                  ? { backgroundColor: rightLedStripColor }
+                  : null,
+              ]}
+            />
+            <TextInput
+              style={[styles.input, styles.inputFlex]}
+              value={rightLedStripColor}
+              onChangeText={setRightLedStripColor}
+              placeholder="Enter LED strip color"
+            />
+          </View>
           <Button
             title="選擇顏色"
             onPress={() => openColorPicker('right', rightLedStripColor)}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>全燈條設定</Text>
-          <TextInput
-            style={styles.input}
-            value={allLedStripColor}
-            onChangeText={setAllLedStripColor}
-            placeholder="Enter LED strip color"
-          />
-          <Button
-            title="選擇顏色"
-            onPress={() => openColorPicker('all', allLedStripColor)}
           />
         </View>
 

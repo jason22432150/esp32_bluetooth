@@ -19,4 +19,4 @@ export type RootStackParamList = {
 };
 
 /** LED 燈條顏色欄位 */
-export type LedColorField = 'left' | 'right' | 'all';
+export type LedColorField = 'left' | 'right';
