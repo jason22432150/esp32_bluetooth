@@ -3,7 +3,6 @@ import {
   Button,
   FlatList,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -20,7 +19,7 @@ import {
   buildStopCommand,
   ensureCommandTerminator,
 } from '../utils/commands';
-import { LedPicker } from './LedPicker';
+import type { RootStackParamList } from '../navigation/types';
 
 export function ControlScreen() {
   const [customCommand, setCustomCommand] = useState('');
@@ -44,11 +43,6 @@ export function ControlScreen() {
     disconnect,
     sendCommand,
   } = useBleStore();
-
-  type RootStackParamList = {
-    Control: undefined;
-    LedPicker: undefined;
-  };
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();

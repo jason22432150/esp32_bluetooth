@@ -1,16 +1,14 @@
 import React, { useEffect } from 'react';
-import {
-  PermissionsAndroid,
-  Platform,
-  StatusBar,
-  useColorScheme,
-} from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ControlScreen } from './src/screens/ControlScreen';
 import { LedPicker } from './src/screens/LedPicker';
+import { ColorPickerPage } from './src/components/ColorPickerPage';
+import type { RootStackParamList } from './src/navigation/types';
 
 async function requestAndroidBlePermissions() {
   if (Platform.OS !== 'android') {
@@ -33,23 +31,32 @@ async function requestAndroidBlePermissions() {
   );
 }
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-  const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
+function App() {
   useEffect(() => {
     requestAndroidBlePermissions();
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Control" component={ControlScreen} />
-          <Stack.Screen name="LedPicker" component={LedPicker} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Control" component={ControlScreen} />
+            <Stack.Screen name="LedPicker" component={LedPicker} />
+            <Stack.Screen
+              name="ColorPicker"
+              component={ColorPickerPage}
+              options={{
+                presentation: 'modal',
+                title: '選擇顏色',
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
