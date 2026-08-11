@@ -4,7 +4,7 @@
 export type RootStackParamList = {
   Control: undefined;
   /** 可選 params：接收 ColorPicker 回傳的選色結果 */
-  LedPicker:
+  LedStripSettings:
     | {
         selectedColor?: string;
         colorField?: LedColorField;

@@ -22,7 +22,7 @@ const DEFAULT_COLOR = 'rgb(255, 0, 0)';
 
 /**
  * 顏色選擇頁面（modal）
- * 確認後透過 navigation.popTo 將 hex 回傳給 LedPicker
+ * 確認後透過 navigation.popTo 將 hex 回傳給 LedStripSettings
  */
 export function ColorPickerPage() {
   const navigation =
@@ -44,9 +44,9 @@ export function ColorPickerPage() {
     setSelectedColor(color.rgb);
   };
 
-  /** 確認選色並回傳給 LedPicker */
+  /** 確認選色並回傳給 LedStripSettings */
   const handleConfirm = () => {
-    navigation.popTo('LedPicker', {
+    navigation.popTo('LedStripSettings', {
       selectedColor: selectedColorRef.current,
       colorField,
     });

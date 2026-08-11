@@ -8,7 +8,11 @@ import { commonStyles as styles } from '../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { LedColorField, RootStackParamList } from '../navigation/types';
 
-export function LedPicker() {
+/**
+ * LED 燈條顏色設定頁
+ * 分別設定左側、右側、全燈條顏色，並可開啟 ColorPicker 選色
+ */
+export function LedStripSettingsScreen() {
   const { ledStripColor, setLedStripColor } = useLedStripColorStore();
   const [leftLedStripColor, setLeftLedStripColor] = useState('');
   const [rightLedStripColor, setRightLedStripColor] = useState('');
@@ -16,7 +20,7 @@ export function LedPicker() {
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, 'LedPicker'>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'LedStripSettings'>>();
 
   // 接收 ColorPicker 回傳的顏色並寫入對應欄位
   useEffect(() => {
@@ -59,7 +63,7 @@ export function LedPicker() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Led Picker</Text>
+        <Text style={styles.title}>LED 燈條設定</Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>左側燈條設定</Text>

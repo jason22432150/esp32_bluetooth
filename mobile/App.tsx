@@ -6,7 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ControlScreen } from './src/screens/ControlScreen';
-import { LedPicker } from './src/screens/LedPicker';
+import { LedStripSettingsScreen } from './src/screens/LedStripSettingsScreen';
 import { ColorPickerPage } from './src/components/ColorPickerPage';
 import type { RootStackParamList } from './src/navigation/types';
 
@@ -44,7 +44,10 @@ function App() {
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen name="Control" component={ControlScreen} />
-            <Stack.Screen name="LedPicker" component={LedPicker} />
+            <Stack.Screen
+              name="LedStripSettings"
+              component={LedStripSettingsScreen}
+            />
             <Stack.Screen
               name="ColorPicker"
               component={ColorPickerPage}

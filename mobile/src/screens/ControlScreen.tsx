@@ -136,7 +136,7 @@ export function ControlScreen() {
         <View style={styles.section}>
           <Button
             title="選擇LED"
-            onPress={() => navigation.navigate('LedPicker')}
+            onPress={() => navigation.navigate('LedStripSettings')}
           />
         </View>
 
