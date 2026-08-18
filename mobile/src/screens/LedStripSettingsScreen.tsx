@@ -7,15 +7,22 @@ import { useLedStripColorStore } from '../store/useLedStripColor';
 import { commonStyles as styles } from '../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { LedColorField, RootStackParamList } from '../navigation/types';
+import { Switch } from 'react-native-gesture-handler';
 
 /**
  * LED 燈條顏色設定頁
  * 分別設定左側、右側、全燈條顏色，並可開啟 ColorPicker 選色
  */
 export function LedStripSettingsScreen() {
-  const { ledStripColor, setLedStripColor } = useLedStripColorStore();
-  const [leftLedStripColor, setLeftLedStripColor] = useState('');
-  const [rightLedStripColor, setRightLedStripColor] = useState('');
+  const {
+    ledStripColor,
+    setLedStripColor,
+    leftLedStripColor,
+    setLeftLedStripColor,
+    rightLedStripColor,
+    setRightLedStripColor,
+  } = useLedStripColorStore();
+  const [isSynced, setIsSynced] = useState(false);
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -35,12 +42,23 @@ export function LedStripSettingsScreen() {
 
     setters[colorField](selectedColor);
 
+    if (isSynced) {
+      setRightLedStripColor(leftLedStripColor);
+    }
+
     // 清除 params，避免重複套用
     navigation.setParams({
       selectedColor: undefined,
       colorField: undefined,
     });
-  }, [route.params, navigation]);
+  }, [
+    route.params,
+    navigation,
+    isSynced,
+    leftLedStripColor,
+    setLeftLedStripColor,
+    setRightLedStripColor,
+  ]);
 
   /**
    * 開啟 ColorPicker modal，並指定回寫欄位
@@ -52,10 +70,14 @@ export function LedStripSettingsScreen() {
     });
   };
 
-  const handleSave = () => {
+  /**
+   * 儲存設定
+   */
+  function handleSave() {
     setLeftLedStripColor(leftLedStripColor);
     setRightLedStripColor(rightLedStripColor);
-  };
+    navigation.goBack();
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -87,6 +109,22 @@ export function LedStripSettingsScreen() {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>全燈條設定</Text>
+          <Text style={styles.sectionTitle}>
+            (勾選後左側、右側燈條顏色會同步)
+          </Text>
+          <View style={styles.horizontalRow}>
+            <Switch
+              value={isSynced}
+              onValueChange={value => setIsSynced(value)}
+            />
+          </View>
+        </View>
+
+        <View
+          style={[styles.section, isSynced && { opacity: 0.4 }]}
+          pointerEvents={isSynced ? 'none' : 'auto'}
+        >
           <Text style={styles.sectionTitle}>右側燈條設定</Text>
           <View style={styles.horizontalRow}>
             <View
@@ -106,6 +144,7 @@ export function LedStripSettingsScreen() {
           </View>
           <Button
             title="選擇顏色"
+            disabled={isSynced}
             onPress={() => openColorPicker('right', rightLedStripColor)}
           />
         </View>
