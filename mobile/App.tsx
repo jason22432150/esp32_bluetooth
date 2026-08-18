@@ -5,10 +5,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { ControlScreen } from './src/screens/ControlScreen';
-import { LedStripSettingsScreen } from './src/screens/LedStripSettingsScreen';
-import { ColorPickerPage } from './src/components/ColorPickerPage';
-import type { RootStackParamList } from './src/navigation/types';
+import { ControlScreen } from './src/page/screens/ControlScreen';
+import { LedStripSettingsScreen } from './src/page/screens/LedStripSettingsScreen';
+import { ColorPickerPage } from './src/page/components/ColorPickerPage';
+import type { RootStackParamList } from './src/types/navigation';
 
 async function requestAndroidBlePermissions() {
   if (Platform.OS !== 'android') {

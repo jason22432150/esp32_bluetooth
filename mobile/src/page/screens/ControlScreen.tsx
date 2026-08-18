@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { commonStyles as styles } from '../theme';
+import { commonStyles as styles } from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useBleStore } from '../store/useBleStore';
+import { useBleStore } from '../../store/useBleStore';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
@@ -18,8 +18,8 @@ import {
   buildRainbowCommand,
   buildStopCommand,
   ensureCommandTerminator,
-} from '../utils/commands';
-import type { RootStackParamList } from '../navigation/types';
+} from '../../utils/commands';
+import type { RootStackParamList } from '../../types/navigation';
 
 export function ControlScreen() {
   const [customCommand, setCustomCommand] = useState('');

@@ -13,10 +13,10 @@ import ColorPicker, {
   type ColorFormatsObject,
 } from 'reanimated-color-picker';
 import { ScrollView } from 'react-native-gesture-handler';
-import type { RootStackParamList } from '../navigation/types';
-import { commonStyles as styles } from '../theme';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
+import type { RootStackParamList } from '../../types/navigation';
+import { commonStyles as styles } from '../../theme';
+import { colors } from '../../theme/colors';
+import { spacing } from '../../theme/spacing';
 
 const DEFAULT_COLOR = 'rgb(255, 0, 0)';
 

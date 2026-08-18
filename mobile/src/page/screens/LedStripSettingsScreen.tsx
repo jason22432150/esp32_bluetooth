@@ -3,10 +3,10 @@ import { View, Text, TextInput, ScrollView, Button } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
-import { useLedStripColorStore } from '../store/useLedStripColor';
-import { commonStyles as styles } from '../theme';
+import { useLedStripColorStore } from '../../store/useLedStripColor';
+import { commonStyles as styles } from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { LedColorField, RootStackParamList } from '../navigation/types';
+import type { LedColorField, RootStackParamList } from '../../types/navigation';
 import { Switch } from 'react-native-gesture-handler';
 
 /**
@@ -126,10 +126,7 @@ export function LedStripSettingsScreen() {
             (勾選後左側、右側燈條顏色會同步)
           </Text>
           <View style={styles.horizontalRow}>
-            <Switch
-              value={isSynced}
-              onValueChange={handleSyncedChange}
-            />
+            <Switch value={isSynced} onValueChange={handleSyncedChange} />
           </View>
         </View>
 
