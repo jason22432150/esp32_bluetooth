@@ -15,8 +15,6 @@ import { Switch } from 'react-native-gesture-handler';
  */
 export function LedStripSettingsScreen() {
   const {
-    ledStripColor,
-    setLedStripColor,
     leftLedStripColor,
     setLeftLedStripColor,
     rightLedStripColor,
@@ -43,7 +41,8 @@ export function LedStripSettingsScreen() {
     setters[colorField](selectedColor);
 
     if (isSynced) {
-      setRightLedStripColor(leftLedStripColor);
+      setRightLedStripColor(selectedColor);
+      setLeftLedStripColor(selectedColor);
     }
 
     // 清除 params，避免重複套用
@@ -56,6 +55,7 @@ export function LedStripSettingsScreen() {
     navigation,
     isSynced,
     leftLedStripColor,
+    rightLedStripColor,
     setLeftLedStripColor,
     setRightLedStripColor,
   ]);
@@ -68,6 +68,16 @@ export function LedStripSettingsScreen() {
       colorField,
       initialColor: initialColor || undefined,
     });
+  };
+
+  /**
+   * 同步開關變更時的處理
+   */
+  const handleSyncedChange = (value: boolean) => {
+    setIsSynced(value);
+    if (value) {
+      setRightLedStripColor(leftLedStripColor);
+    }
   };
 
   /**
@@ -104,7 +114,9 @@ export function LedStripSettingsScreen() {
           </View>
           <Button
             title="選擇顏色"
-            onPress={() => openColorPicker('left', leftLedStripColor)}
+            onPress={() => {
+              openColorPicker('left', leftLedStripColor);
+            }}
           />
         </View>
 
@@ -116,7 +128,7 @@ export function LedStripSettingsScreen() {
           <View style={styles.horizontalRow}>
             <Switch
               value={isSynced}
-              onValueChange={value => setIsSynced(value)}
+              onValueChange={handleSyncedChange}
             />
           </View>
         </View>
@@ -150,12 +162,12 @@ export function LedStripSettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <TextInput
+          {/* <TextInput
             style={styles.input}
             value={ledStripColor}
             onChangeText={setLedStripColor}
             placeholder="Enter LED strip color"
-          />
+          /> */}
           <Button title="儲存" onPress={handleSave} />
         </View>
       </ScrollView>
