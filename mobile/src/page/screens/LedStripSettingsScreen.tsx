@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { useLedStripColorStore } from '../../store/useLedStripColor';
-import { commonStyles as styles } from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { LedColorField, RootStackParamList } from '../../types/navigation';
 import { Switch } from 'react-native-gesture-handler';
 import { Button, CustomButton } from '../../components/Button';
+import { Input, ScrollView, Text, XStack, YStack } from 'tamagui';
 
 /**
  * LED 燈條顏色設定頁
@@ -93,88 +92,111 @@ export function LedStripSettingsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>LED 燈條設定</Text>
+    <YStack flex={1} bg="$background">
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
+        <ScrollView flex={1}>
+          <YStack p="$4" gap="$4">
+            <Text fontSize={24} fontWeight="700" color="$color12">
+              LED 燈條設定
+            </Text>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>左側燈條設定</Text>
-          <View style={styles.horizontalRow}>
-            <View
-              style={[
-                styles.colorPreview,
-                leftLedStripColor
-                  ? { backgroundColor: leftLedStripColor }
-                  : null,
-              ]}
-            />
-            <TextInput
-              style={[styles.input, styles.inputFlex]}
-              value={leftLedStripColor}
-              onChangeText={setLeftLedStripColor}
-              placeholder="Enter LED strip color"
-            />
-          </View>
-          <CustomButton
-            onPress={() => {
-              openColorPicker('left', leftLedStripColor);
-            }}
-          >
-            <Button.Text>選擇顏色</Button.Text>
-          </CustomButton>
-        </View>
+            <YStack gap="$3">
+              <Text fontSize={18} fontWeight="600" color="$color12">
+                左側燈條設定
+              </Text>
+              <XStack items="center" gap="$3">
+                <YStack
+                  width={44}
+                  height={44}
+                  rounded="$3"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                  bg="$color2"
+                  style={
+                    leftLedStripColor
+                      ? { backgroundColor: 'rgb(' + leftLedStripColor + ')' }
+                      : undefined
+                  }
+                />
+                <Input
+                  flex={1}
+                  value={leftLedStripColor}
+                  onChangeText={setLeftLedStripColor}
+                  placeholder="Enter LED strip color"
+                  borderColor="$borderColor"
+                  bg="$color2"
+                  color="$color12"
+                />
+              </XStack>
+              <CustomButton
+                onPress={() => {
+                  openColorPicker('left', leftLedStripColor);
+                }}
+              >
+                <Button.Text>選擇顏色</Button.Text>
+              </CustomButton>
+            </YStack>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>全燈條設定</Text>
-          <Text style={styles.sectionTitle}>
-            (勾選後左側、右側燈條顏色會同步)
-          </Text>
-          <View style={styles.horizontalRow}>
-            <Switch value={isSynced} onValueChange={handleSyncedChange} />
-          </View>
-        </View>
+            <YStack gap="$3">
+              <Text fontSize={18} fontWeight="600" color="$color12">
+                全燈條設定
+              </Text>
+              <Text fontSize={18} fontWeight="600" color="$color12">
+                (勾選後左側、右側燈條顏色會同步)
+              </Text>
+              <XStack items="center" gap="$3">
+                <Switch value={isSynced} onValueChange={handleSyncedChange} />
+              </XStack>
+            </YStack>
 
-        <View
-          style={[styles.section, isSynced && { opacity: 0.4 }]}
-          pointerEvents={isSynced ? 'none' : 'auto'}
-        >
-          <Text style={styles.sectionTitle}>右側燈條設定</Text>
-          <View style={styles.horizontalRow}>
-            <View
-              style={[
-                styles.colorPreview,
-                rightLedStripColor
-                  ? { backgroundColor: rightLedStripColor }
-                  : null,
-              ]}
-            />
-            <TextInput
-              style={[styles.input, styles.inputFlex]}
-              value={rightLedStripColor}
-              onChangeText={setRightLedStripColor}
-              placeholder="Enter LED strip color"
-            />
-          </View>
-          <CustomButton
-            disabled={isSynced}
-            onPress={() => openColorPicker('right', rightLedStripColor)}
-          >
-            <Button.Text>選擇顏色</Button.Text>
-          </CustomButton>
-        </View>
+            <YStack
+              gap="$3"
+              opacity={isSynced ? 0.4 : 1}
+              pointerEvents={isSynced ? 'none' : 'auto'}
+            >
+              <Text fontSize={18} fontWeight="600" color="$color12">
+                右側燈條設定
+              </Text>
+              <XStack items="center" gap="$3">
+                <YStack
+                  width={44}
+                  height={44}
+                  rounded="$3"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                  bg="$color2"
+                  style={
+                    rightLedStripColor
+                      ? { backgroundColor: 'rgb(' + rightLedStripColor + ')' }
+                      : undefined
+                  }
+                />
+                <Input
+                  flex={1}
+                  value={rightLedStripColor}
+                  onChangeText={setRightLedStripColor}
+                  placeholder="Enter LED strip color"
+                  borderColor="$borderColor"
+                  bg="$color2"
+                  color="$color12"
+                />
+              </XStack>
+              <CustomButton
+                disabled={isSynced}
+                onPress={() => openColorPicker('right', rightLedStripColor)}
+              >
+                <Button.Text>選擇顏色</Button.Text>
+              </CustomButton>
+            </YStack>
 
-        <View style={styles.section}>
-          {/* <TextInput
-            style={styles.input}
-            value={ledStripColor}
-            onChangeText={setLedStripColor}
-            placeholder="Enter LED strip color"
-          /> */}
-          <CustomButton theme="green" onPress={handleSave}>
-            <Button.Text>儲存</Button.Text>
-          </CustomButton>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            <YStack gap="$3">
+              <CustomButton theme="green" onPress={handleSave}>
+                <Button.Text>儲存</Button.Text>
+              </CustomButton>
+            </YStack>
+          </YStack>
+        </ScrollView>
+      </SafeAreaView>
+    </YStack>
   );
 }

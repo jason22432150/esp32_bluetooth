@@ -15,10 +15,6 @@ const themes = createV5Theme({
     cyan: { light: cyan, dark: cyanDark },
     amber: { light: amber, dark: amberDark },
   },
-  // 覆寫所有 theme 的 $background（非 childrenThemes 職責）
-  getTheme: () => ({
-    background: '#000',
-  }),
 });
 
 export const config = createTamagui({

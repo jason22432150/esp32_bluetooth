@@ -1,32 +1,31 @@
 import { Label, Separator, Switch, XStack } from 'tamagui';
-import { SwitchProps } from 'tamagui';
+import type { SwitchProps } from 'tamagui';
 
 export { Switch };
 
+type CustomSwitchProps = SwitchProps & {
+  /** Label 文案，預設「深色模式」 */
+  label?: string;
+};
+
 export function CustomSwitch({
-  defaultChecked = false,
+  label = '深色模式',
   ...props
-}: SwitchProps) {
+}: CustomSwitchProps) {
   return (
     <XStack items="center" gap="$4">
-      <Label
-        pr="$0"
-        minW={90}
-        justify="flex-end"
-        size={props.size}
-      >
-        Accept
+      <Label pr="$0" minW={90} justify="flex-end" size={props.size}>
+        {label}
       </Label>
       <Separator minH={20} vertical />
       <Switch
         transition="300ms"
-        size={props.size}
-        defaultChecked={defaultChecked}
-        // use activeStyle to choose youra active color
+        // use activeStyle to choose your active color
         // default to $backgroundActive unless "unstyled" boolean prop is on
         activeStyle={{
           backgroundColor: '$color6',
         }}
+        {...props}
       >
         <Switch.Thumb transition="quickest" />
       </Switch>

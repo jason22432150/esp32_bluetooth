@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react';
-import { PermissionsAndroid, Platform } from 'react-native';
+import { PermissionsAndroid, Platform, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { getVariableValue, TamaguiProvider, useTheme, YStack } from 'tamagui';
 
 import { ControlScreen } from './src/page/screens/ControlScreen';
 import { LedStripSettingsScreen } from './src/page/screens/LedStripSettingsScreen';
 import { ColorPickerPage } from './src/page/components/ColorPickerPage';
 import type { RootStackParamList } from './src/types/navigation';
-
-import { TamaguiProvider, Text } from '@tamagui/core';
 import { config } from './tamagui.config';
+import { useThemeStore } from './src/store/useThemeStore';
 
 async function requestAndroidBlePermissions() {
   if (Platform.OS !== 'android') {
@@ -36,17 +36,30 @@ async function requestAndroidBlePermissions() {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-function App() {
-  useEffect(() => {
-    requestAndroidBlePermissions();
-  }, []);
+/**
+ * 在 TamaguiProvider 內讀取 theme token，驅動 Navigator / 根背景
+ */
+function ThemedNavigation() {
+  const theme = useTheme();
+  const background = String(getVariableValue(theme.background));
+  const color = String(getVariableValue(theme.color));
+  const surface = String(
+    getVariableValue(theme.backgroundHover ?? theme.background),
+  );
 
   return (
-    <TamaguiProvider config={config} defaultTheme="light">
-      <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={[styles.flex, { backgroundColor: background }]}>
+      <YStack flex={1} bg="$background">
         <SafeAreaProvider>
           <NavigationContainer>
-            <Stack.Navigator>
+            <Stack.Navigator
+              screenOptions={{
+                contentStyle: { backgroundColor: background },
+                headerStyle: { backgroundColor: surface },
+                headerTintColor: color,
+                headerTitleStyle: { color },
+              }}
+            >
               <Stack.Screen name="Control" component={ControlScreen} />
               <Stack.Screen
                 name="LedStripSettings"
@@ -63,9 +76,27 @@ function App() {
             </Stack.Navigator>
           </NavigationContainer>
         </SafeAreaProvider>
-      </GestureHandlerRootView>
+      </YStack>
+    </GestureHandlerRootView>
+  );
+}
+
+function App() {
+  const scheme = useThemeStore(state => state.scheme);
+
+  useEffect(() => {
+    requestAndroidBlePermissions();
+  }, []);
+
+  return (
+    <TamaguiProvider config={config} defaultTheme={scheme}>
+      <ThemedNavigation />
     </TamaguiProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+});
 
 export default App;

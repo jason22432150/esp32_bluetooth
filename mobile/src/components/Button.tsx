@@ -9,6 +9,5 @@ export { Button };
  * `<CustomButton onPress={...}><Button.Text>斷線</Button.Text></CustomButton>`
  */
 export function CustomButton({ theme = 'blue', ...props }: ButtonProps) {
-  console.log('theme', theme);
   return <Button theme={theme} {...props} />;
 }
