@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Button,
   FlatList,
   ScrollView,
   Text,
@@ -8,6 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Button, CustomButton } from '../../components/Button';
+import { XStack } from 'tamagui';
 import { commonStyles as styles } from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useBleStore } from '../../store/useBleStore';
@@ -20,6 +21,8 @@ import {
   ensureCommandTerminator,
 } from '../../utils/commands';
 import type { RootStackParamList } from '../../types/navigation';
+import { DemoCard } from '../../components/Card';
+import { CustomSwitch } from '../../components/Switch';
 
 export function ControlScreen() {
   const [customCommand, setCustomCommand] = useState('');
@@ -38,6 +41,7 @@ export function ControlScreen() {
     devices,
     logs,
     startScan,
+    clearLogs,
     stopScan,
     connect,
     disconnect,
@@ -56,9 +60,37 @@ export function ControlScreen() {
     setCustomCommand('');
   };
 
+  const scanButtonTheme = (scanButtonState: boolean) => {
+    return scanButtonState ? 'red' : 'green';
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
+        {/* 外層 ScrollView 只負責上下滾動；左右滑動需另包 horizontal ScrollView */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+        >
+          <XStack gap="$4">
+            <DemoCard
+              transition="bouncy"
+              size="$4"
+              width={250}
+              height={300}
+              scale={0.9}
+              hoverStyle={{ scale: 0.925 }}
+              pressStyle={{ scale: 0.875 }}
+            />
+            <DemoCard size="$5" width={250} height={300} />
+          </XStack>
+        </ScrollView>
+
+        <XStack>
+          <CustomSwitch defaultChecked={true} />
+        </XStack>
+
         <Text style={styles.title}>ESP32 BLE Control</Text>
 
         <View style={styles.section}>
@@ -70,12 +102,16 @@ export function ControlScreen() {
           </Text>
 
           {connectedDevice ? (
-            <Button title="斷線" onPress={disconnect} />
+            <CustomButton onPress={disconnect} theme="red">
+              <Button.Text>斷線</Button.Text>
+            </CustomButton>
           ) : (
-            <Button
-              title={isScanning ? '停止掃描' : '開始掃描'}
+            <CustomButton
               onPress={isScanning ? stopScan : startScan}
-            />
+              theme={scanButtonTheme(isScanning)}
+            >
+              <Button.Text>{isScanning ? '停止掃描' : '開始掃描'}</Button.Text>
+            </CustomButton>
           )}
 
           {isConnecting ? <Text style={styles.hint}>連線中...</Text> : null}
@@ -111,33 +147,33 @@ export function ControlScreen() {
           <Text style={styles.sectionTitle}>快捷指令</Text>
 
           <View style={styles.buttonGrid}>
-            <Button
-              title="stop"
+            <CustomButton
+              theme="red"
               onPress={() => sendCommand(buildStopCommand())}
-            />
+            >
+              <Button.Text>stop</Button.Text>
+            </CustomButton>
             {modes.map(mode => (
-              <Button
+              <CustomButton
                 key={mode}
-                title={`mode${mode}`}
                 onPress={() => sendCommand(buildModeCommand(mode as string))}
-              />
+              >
+                <Button.Text>{`mode${mode}`}</Button.Text>
+              </CustomButton>
             ))}
-            <Button
-              title="rainbow1"
-              onPress={() => sendCommand(buildRainbowCommand(1))}
-            />
-            <Button
-              title="rainbow2"
-              onPress={() => sendCommand(buildRainbowCommand(2))}
-            />
+            <CustomButton onPress={() => sendCommand(buildRainbowCommand(1))}>
+              <Button.Text>rainbow1</Button.Text>
+            </CustomButton>
+            <CustomButton onPress={() => sendCommand(buildRainbowCommand(2))}>
+              <Button.Text>rainbow2</Button.Text>
+            </CustomButton>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Button
-            title="選擇LED"
-            onPress={() => navigation.navigate('LedStripSettings')}
-          />
+          <CustomButton onPress={() => navigation.navigate('LedStripSettings')}>
+            <Button.Text>選擇LED</Button.Text>
+          </CustomButton>
         </View>
 
         <View style={styles.section}>
@@ -152,11 +188,16 @@ export function ControlScreen() {
             autoCorrect={false}
           />
 
-          <Button title="送出" onPress={handleSendCustom} />
+          <CustomButton theme="green" onPress={handleSendCustom}>
+            <Button.Text>送出</Button.Text>
+          </CustomButton>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Log</Text>
+          <CustomButton theme="red" onPress={clearLogs}>
+            <Button.Text>清空</Button.Text>
+          </CustomButton>
 
           {logs.map(log => (
             <Text key={log.id} style={styles.logText}>

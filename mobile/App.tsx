@@ -10,6 +10,9 @@ import { LedStripSettingsScreen } from './src/page/screens/LedStripSettingsScree
 import { ColorPickerPage } from './src/page/components/ColorPickerPage';
 import type { RootStackParamList } from './src/types/navigation';
 
+import { TamaguiProvider, Text } from '@tamagui/core';
+import { config } from './tamagui.config';
+
 async function requestAndroidBlePermissions() {
   if (Platform.OS !== 'android') {
     return;
@@ -39,27 +42,29 @@ function App() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name="Control" component={ControlScreen} />
-            <Stack.Screen
-              name="LedStripSettings"
-              component={LedStripSettingsScreen}
-            />
-            <Stack.Screen
-              name="ColorPicker"
-              component={ColorPickerPage}
-              options={{
-                presentation: 'modal',
-                title: '選擇顏色',
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <TamaguiProvider config={config} defaultTheme="light">
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="Control" component={ControlScreen} />
+              <Stack.Screen
+                name="LedStripSettings"
+                component={LedStripSettingsScreen}
+              />
+              <Stack.Screen
+                name="ColorPicker"
+                component={ColorPickerPage}
+                options={{
+                  presentation: 'modal',
+                  title: '選擇顏色',
+                }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </TamaguiProvider>
   );
 }
 

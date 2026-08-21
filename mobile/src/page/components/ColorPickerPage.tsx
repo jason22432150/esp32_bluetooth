@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -17,8 +17,9 @@ import type { RootStackParamList } from '../../types/navigation';
 import { commonStyles as styles } from '../../theme';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
+import { Button, CustomButton } from '../../components/Button';
 
-const DEFAULT_COLOR = 'rgb(255, 0, 0)';
+const DEFAULT_COLOR = '255, 0, 0';
 
 /**
  * 顏色選擇頁面（modal）
@@ -70,17 +71,16 @@ export function ColorPickerPage() {
             <HueSlider style={localStyles.hueSlider} vertical />
           </View>
 
-          {/* <View style={localStyles.opacitySection}>
-            <Text style={styles.label}>Opacity</Text>
-            <OpacitySlider />
-          </View> */}
-
           <Swatches />
         </ColorPicker>
 
         <View style={localStyles.actions}>
-          <Button title="取消" onPress={() => navigation.goBack()} />
-          <Button title="確認" onPress={handleConfirm} />
+          <CustomButton theme="red" onPress={() => navigation.goBack()}>
+            <Button.Text>取消</Button.Text>
+          </CustomButton>
+          <CustomButton theme="green" onPress={handleConfirm}>
+            <Button.Text>確認</Button.Text>
+          </CustomButton>
         </View>
       </ScrollView>
     </SafeAreaView>

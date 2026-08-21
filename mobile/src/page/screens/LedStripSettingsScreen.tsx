@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, ScrollView, Button } from 'react-native';
+import { View, Text, TextInput, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import { commonStyles as styles } from '../../theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { LedColorField, RootStackParamList } from '../../types/navigation';
 import { Switch } from 'react-native-gesture-handler';
+import { Button, CustomButton } from '../../components/Button';
 
 /**
  * LED 燈條顏色設定頁
@@ -64,6 +65,8 @@ export function LedStripSettingsScreen() {
    * 開啟 ColorPicker modal，並指定回寫欄位
    */
   const openColorPicker = (colorField: LedColorField, initialColor: string) => {
+    console.log('initialColor', initialColor);
+    console.log('colorField', colorField);
     navigation.navigate('ColorPicker', {
       colorField,
       initialColor: initialColor || undefined,
@@ -112,12 +115,13 @@ export function LedStripSettingsScreen() {
               placeholder="Enter LED strip color"
             />
           </View>
-          <Button
-            title="選擇顏色"
+          <CustomButton
             onPress={() => {
               openColorPicker('left', leftLedStripColor);
             }}
-          />
+          >
+            <Button.Text>選擇顏色</Button.Text>
+          </CustomButton>
         </View>
 
         <View style={styles.section}>
@@ -151,11 +155,12 @@ export function LedStripSettingsScreen() {
               placeholder="Enter LED strip color"
             />
           </View>
-          <Button
-            title="選擇顏色"
+          <CustomButton
             disabled={isSynced}
             onPress={() => openColorPicker('right', rightLedStripColor)}
-          />
+          >
+            <Button.Text>選擇顏色</Button.Text>
+          </CustomButton>
         </View>
 
         <View style={styles.section}>
@@ -165,7 +170,9 @@ export function LedStripSettingsScreen() {
             onChangeText={setLedStripColor}
             placeholder="Enter LED strip color"
           /> */}
-          <Button title="儲存" onPress={handleSave} />
+          <CustomButton theme="green" onPress={handleSave}>
+            <Button.Text>儲存</Button.Text>
+          </CustomButton>
         </View>
       </ScrollView>
     </SafeAreaView>
