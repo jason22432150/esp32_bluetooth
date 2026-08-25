@@ -8,6 +8,7 @@ import type { LedColorField, RootStackParamList } from '../../types/navigation';
 import { Switch } from 'react-native-gesture-handler';
 import { Button, CustomButton } from '../../components/Button';
 import { Input, ScrollView, Text, XStack, YStack } from 'tamagui';
+import { toast } from '@tamagui/toast/v2';
 
 /**
  * LED 燈條顏色設定頁
@@ -85,9 +86,10 @@ export function LedStripSettingsScreen() {
   /**
    * 儲存設定
    */
-  function handleSave() {
+  function handleApply() {
     setLeftLedStripColor(leftLedStripColor);
     setRightLedStripColor(rightLedStripColor);
+    toast.success('套用成功');
     navigation.goBack();
   }
 
@@ -190,8 +192,8 @@ export function LedStripSettingsScreen() {
             </YStack>
 
             <YStack gap="$3">
-              <CustomButton theme="green" onPress={handleSave}>
-                <Button.Text>儲存</Button.Text>
+              <CustomButton theme="green" onPress={handleApply}>
+                <Button.Text>套用</Button.Text>
               </CustomButton>
             </YStack>
           </YStack>

@@ -12,6 +12,7 @@ import { ColorPickerPage } from './src/page/components/ColorPickerPage';
 import type { RootStackParamList } from './src/types/navigation';
 import { config } from './tamagui.config';
 import { useThemeStore } from './src/store/useThemeStore';
+import { CustomToast } from './src/components/Toast';
 
 async function requestAndroidBlePermissions() {
   if (Platform.OS !== 'android') {
@@ -91,6 +92,7 @@ function App() {
   return (
     <TamaguiProvider config={config} defaultTheme={scheme}>
       <ThemedNavigation />
+      <CustomToast/>
     </TamaguiProvider>
   );
 }

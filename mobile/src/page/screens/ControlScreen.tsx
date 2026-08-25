@@ -71,21 +71,6 @@ export function ControlScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
         <ScrollView flex={1}>
           <YStack p="$4" gap="$4">
-          {/* 外層 ScrollView 只負責上下滾動；左右滑動需另包 horizontal ScrollView */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <XStack gap="$4" px="$4">
-              <DemoCard
-                transition="bouncy"
-                size="$4"
-                width={250}
-                height={300}
-                scale={0.9}
-                hoverStyle={{ scale: 0.925 }}
-                pressStyle={{ scale: 0.875 }}
-              />
-              <DemoCard size="$5" width={250} height={300} />
-            </XStack>
-          </ScrollView>
 
           <XStack>
             <CustomSwitch
